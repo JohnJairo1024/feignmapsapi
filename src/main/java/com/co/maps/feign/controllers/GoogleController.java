@@ -2,6 +2,7 @@ package com.co.maps.feign.controllers;
 
 
 import com.co.maps.feign.domain.GoogleEntidad;
+import com.co.maps.feign.dto.DestinoOrigen;
 import com.co.maps.feign.dto.GoogleMaps;
 import com.co.maps.feign.services.GoogleMapsService;
 import org.slf4j.Logger;
@@ -35,6 +36,18 @@ public class GoogleController {
         }
         return ResponseEntity.notFound().build();
 
+    }
+
+    @GetMapping("/maps")
+    public ResponseEntity<List<GoogleMaps>> getByDistanceDuration(
+            @RequestParam String destino,
+            @RequestParam String origen
+    ) {
+        List<GoogleMaps> findByoriginAddresses = googleMapsService.findByOrigenDestino(destino, origen);
+        if (findByoriginAddresses != null) {
+            return ResponseEntity.ok(findByoriginAddresses);
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }

@@ -33,14 +33,32 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
     @Override
     public List<GoogleMaps> findAll() {
         List<GoogleEntidad> lista = googleRepository.findAll();
+        return getGoogleMaps(lista);
+    }
+
+    @Override
+    public GoogleEntidad findById(long id) {
+        GoogleEntidad findById = googleRepository.findById(id).orElseGet(null);
+        return findById;
+    }
+
+    @Override
+    public List<GoogleMaps> findByOrigenDestino(String destino, String origen) {
+        List<GoogleEntidad> findByDestinoAndOrigen = googleRepository.findByDestinoAndOrigen(destino, origen);
+        return getGoogleMaps(findByDestinoAndOrigen);
+    }
+
+    /**
+     *
+     * @param findByDestinoAndOrigen
+     * @return
+     */
+    private List<GoogleMaps> getGoogleMaps(List<GoogleEntidad> findByDestinoAndOrigen) {
         List<GoogleMaps> listaDTO = new ArrayList<>();
-        for (GoogleEntidad googleEntidad : lista) {
+        for (GoogleEntidad googleEntidad : findByDestinoAndOrigen) {
             GoogleMaps googleMaps = new GoogleMaps();
             googleMaps.setDestinationAddresses(Collections.singletonList(googleEntidad.getDestinationAddresses()));
             googleMaps.setOriginAddresses(Collections.singletonList(googleEntidad.getOriginAddresses()));
-
-
-            ;
 
             //lista de elementos
             Element element = new Element();
@@ -57,13 +75,14 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
                 }).forEachOrdered((distance) -> distances.add(distance));
             }
 
+            // recorre la distancia
             for (Distance distance : distances) {
                 distance.setText(distance.getText());
                 distance.setValue(distance.getValue());
                 element.setDistance(distance);
             }
 
-            //lista de duration
+            //lista de duracion
             List<DurationEntidad> durationEntidad = durationRepository.findById(googleEntidad.getGoogleId());
             List<Duration> durations = new ArrayList<>();
             if (durationEntidad != null && !durationEntidad.isEmpty()) {
@@ -74,6 +93,8 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
                     return duration;
                 }).forEachOrdered((duration) -> durations.add(duration));
             }
+
+            // recorre la duracion
             for (Duration duration : durations) {
                 duration.setText(duration.getText());
                 duration.setValue(duration.getValue());
@@ -87,14 +108,9 @@ public class GoogleMapsServiceImpl implements GoogleMapsService {
             googleMaps.setStatus("OK");
 
             listaDTO.add(googleMaps);
+
         }
         return listaDTO;
-    }
-
-    @Override
-    public GoogleEntidad findById(long id) {
-        GoogleEntidad findById = googleRepository.findById(id).orElseGet(null);
-        return findById;
     }
 
 }
