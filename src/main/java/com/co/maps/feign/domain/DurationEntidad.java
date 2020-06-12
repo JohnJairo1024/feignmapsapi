@@ -15,7 +15,7 @@ public class DurationEntidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "distanceId")
-    private long distanceId;
+    private long durationId;
 
     @Column(name = "text")
     private String text;
